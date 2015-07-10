@@ -1,6 +1,5 @@
 #Created by Kin-Ho Lam 7/9/15 for the COF Helpdesk
-import sys, os, datetime
-import re
+import sys, os, datetime, re
 
 def check_commas(zone_path):
 	if(os.path.exists(zone_path)):
@@ -16,13 +15,13 @@ def check_commas(zone_path):
 	zone.close();
 	comma_file.close();
 
-def fix_date(col, zone_path):
+def fix_date(name , col, zone_path):
 	if(os.path.exists(zone_path)):
 		zone = open(zone_path, 'r+');
 	else:
 		return; 
 	file_error = open('zone_tmp.txt', 'w+');
-	fix_log = open('fix_log.txt', 'w+');
+	fix_log = open(name + 'fix_log.txt', 'w+');
 	for line in zone: 
 		entry = line.split(",'");
 		row = entry[col].replace("'", "");
@@ -43,14 +42,18 @@ def fix_date(col, zone_path):
 				fix = edit[0] +"/" + edit[1]+ "/" + edit[2];
 				file_error.write(line.replace(row, fix));
 				fix_log.write(entry[0].replace("'", "").replace(".fsl.orst.edu","").replace(".cof.orst.edu","").replace(".forestry.oregonstate.edu", "") + "\tReplaced "+ row + " with " + fix + "\n")
+			else:
+				file_error.write(line);
 		else:
 			file_error.write(line);
-			fix_log.write(entry[0].replace("'", "").replace(".fsl.orst.edu","").replace(".cof.orst.edu","").replace(".forestry.oregonstate.edu", "") + "\tIs valid\n")
 	zone.close();
 	file_error.close();
+	os.remove(zone_path);
+	os.rename("zone_tmp.txt", "zone.txt");
 
 def main():
 	zone_path = "zone.txt";
 	check_commas(zone_path);
-	fix_date(10, zone_path);
+	fix_date("purchase", 10, zone_path);
+	fix_date("warranty", 12, zone_path);
 main(); #run main
